@@ -150,108 +150,209 @@
 
     <script src="script.js"></script>
 
-<!-- Estilos para forzar posición correcta del chat n8n -->
+<!-- Estilos del chat flotante personalizado -->
 <style>
-    /* Forzar posición inferior derecha en todos los elementos del chat */
-    #n8n-chat,
-    [id*="n8n-chat"],
-    .n8n-chat,
-    [class*="n8n-chat"] {
-        position: fixed !important;
-        bottom: 20px !important;
-        right: 20px !important;
-        left: auto !important;
-        top: auto !important;
-        z-index: 99999 !important;
-    }
+  #zanabot-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 99999;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,114,255,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+  }
+  #zanabot-btn:hover { transform: scale(1.1); }
+  #zanabot-btn svg { width: 28px; height: 28px; fill: white; }
 
-    /* El botón flotante */
-    #n8n-chat .chat-button,
-    [class*="chat-button"],
-    [class*="chatButton"] {
-        position: fixed !important;
-        bottom: 20px !important;
-        right: 20px !important;
-        left: auto !important;
-        width: 60px !important;
-        height: 60px !important;
-        border-radius: 50% !important;
-        cursor: pointer !important;
-    }
+  #zanabot-window {
+    position: fixed;
+    bottom: 96px;
+    right: 24px;
+    z-index: 99998;
+    width: 360px;
+    max-height: 520px;
+    background: #1a1a2e;
+    border-radius: 18px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: sans-serif;
+  }
+  #zanabot-window.open { display: flex; }
 
-    /* La ventana del chat cuando se abre */
-    [class*="chat-window"],
-    [class*="chatWindow"],
-    [class*="n8n-chat"] .chat-window {
-        position: fixed !important;
-        bottom: 90px !important;
-        right: 20px !important;
-        left: auto !important;
-        top: auto !important;
-        width: 380px !important;
-        max-height: 600px !important;
-        border-radius: 16px !important;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.18) !important;
-    }
+  #zanabot-header {
+    background: linear-gradient(135deg, #0072ff, #00c6ff);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  #zanabot-header .info { display: flex; align-items: center; gap: 10px; }
+  #zanabot-header .avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  #zanabot-header .name { color: white; font-weight: 600; font-size: 15px; }
+  #zanabot-header .status { color: rgba(255,255,255,0.8); font-size: 12px; }
+  #zanabot-close {
+    background: none; border: none; color: white;
+    font-size: 22px; cursor: pointer; line-height: 1;
+  }
 
-    /* Ocultar el chat abierto por defecto */
-    [class*="chat-wrapper"],
-    [class*="chatWrapper"] {
-        display: none;
-    }
-    [class*="chat-wrapper"].open,
-    [class*="chatWrapper"].open {
-        display: flex !important;
-    }
+  #zanabot-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #0f0f1a;
+  }
+  .zana-msg {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .zana-msg.bot {
+    background: #1e2a45;
+    color: #e0e0e0;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .zana-msg.user {
+    background: linear-gradient(135deg, #0072ff, #00c6ff);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+  .zana-typing {
+    color: #888;
+    font-size: 13px;
+    align-self: flex-start;
+    padding: 6px 0;
+    display: none;
+  }
+
+  #zanabot-input-area {
+    display: flex;
+    gap: 8px;
+    padding: 12px 14px;
+    background: #1a1a2e;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  #zanabot-input {
+    flex: 1;
+    background: #0f0f1a;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 24px;
+    padding: 10px 16px;
+    color: white;
+    font-size: 14px;
+    outline: none;
+  }
+  #zanabot-input::placeholder { color: #666; }
+  #zanabot-send {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0072ff, #00c6ff);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  #zanabot-send svg { width: 18px; height: 18px; fill: white; }
 </style>
 
-<script type="module">
-    import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
-    
-    createChat({
-        webhookUrl: 'https://paneln8n.serviciosatumedidapro.com/webhook/3730d8bd-2059-48b9-a450-bfa589295b74/chat',
-        showWelcomeScreen: false,
-        defaultLanguage: 'es',
-        initialMessages: [
-            '¡Hola! 👋',
-            'Soy ZanaBot, el asistente de Zanaceutica EIRL. ¿Cómo puedo ayudarte hoy?'
-        ],
-        i18n: {
-            es: {
-                title: '¡Qué tal! 👋',
-                subtitle: 'Hablamos. Estamos disponibles 24/7.',
-                footer: '',
-                getStarted: 'Nueva conversación',
-                inputPlaceholder: 'Pregunta lo que quieras',
-            },
-        },
-    });
+<!-- Botón flotante -->
+<button id="zanabot-btn" onclick="toggleZanaBot()" title="Chatear con ZanaBot">
+  <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+</button>
 
-    // Forzar posición derecha con observer robusto
-    function fixChatPosition() {
-        const selectors = [
-            '#n8n-chat',
-            '[id*="n8n"]',
-            '[class*="n8n-chat"]',
-            '[class*="chat-container"]',
-            '[class*="chatContainer"]'
-        ];
-        selectors.forEach(sel => {
-            document.querySelectorAll(sel).forEach(el => {
-                el.style.setProperty('right', '20px', 'important');
-                el.style.setProperty('left', 'auto', 'important');
-                el.style.setProperty('bottom', '20px', 'important');
-                el.style.setProperty('position', 'fixed', 'important');
-            });
-        });
+<!-- Ventana del chat -->
+<div id="zanabot-window">
+  <div id="zanabot-header">
+    <div class="info">
+      <div class="avatar">🤖</div>
+      <div>
+        <div class="name">ZanaBot</div>
+        <div class="status">● Disponible 24/7</div>
+      </div>
+    </div>
+    <button id="zanabot-close" onclick="toggleZanaBot()">×</button>
+  </div>
+
+  <div id="zanabot-messages">
+    <div class="zana-msg bot">¡Hola! 👋</div>
+    <div class="zana-msg bot">Soy ZanaBot, el asistente de Zanaceutica EIRL. ¿Cómo puedo ayudarte hoy?</div>
+  </div>
+  <div class="zana-typing" id="zana-typing">ZanaBot está escribiendo...</div>
+
+  <div id="zanabot-input-area">
+    <input id="zanabot-input" type="text" placeholder="Pregunta lo que quieras..." 
+           onkeydown="if(event.key==='Enter') sendZanaMsg()">
+    <button id="zanabot-send" onclick="sendZanaMsg()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  const WEBHOOK_URL = 'https://paneln8n.serviciosatumedidapro.com/webhook/3730d8bd-2059-48b9-a450-bfa589295b74/chat';
+  let sessionId = 'session_' + Math.random().toString(36).substr(2, 9);
+  let chatOpen = false;
+
+  function toggleZanaBot() {
+    chatOpen = !chatOpen;
+    document.getElementById('zanabot-window').classList.toggle('open', chatOpen);
+  }
+
+  function addMsg(text, role) {
+    const box = document.getElementById('zanabot-messages');
+    const div = document.createElement('div');
+    div.className = 'zana-msg ' + role;
+    div.textContent = text;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  async function sendZanaMsg() {
+    const input = document.getElementById('zanabot-input');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    addMsg(text, 'user');
+
+    const typing = document.getElementById('zana-typing');
+    typing.style.display = 'block';
+
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'sendMessage', sessionId, chatInput: text })
+      });
+      const data = await res.json();
+      typing.style.display = 'none';
+      const reply = data.output || data.text || data.message || 'Sin respuesta del servidor.';
+      addMsg(reply, 'bot');
+    } catch (e) {
+      typing.style.display = 'none';
+      addMsg('Hubo un error al conectar. Intenta de nuevo.', 'bot');
     }
-
-    // Observer que vigila cualquier elemento nuevo que agregue el widget
-    const observer = new MutationObserver(() => fixChatPosition());
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    // Intentos escalonados para asegurar que cargue
-    [100, 300, 600, 1000, 2000].forEach(ms => setTimeout(fixChatPosition, ms));
+  }
 </script>
 </body>
 </html>
