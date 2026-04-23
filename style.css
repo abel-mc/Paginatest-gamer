@@ -54,7 +54,12 @@ header {
 .section-title { color: var(--primary-cyan); margin-bottom: 30px; }
 .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .card { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
-.card img { width: 100%; height: 130px; object-fit: contain; }
+.card img {
+    width: 100%;
+    max-width: 200px; /* Evita que la imagen crezca demasiado en pantallas gigantes */
+    height: auto;
+    margin: 0 auto;
+}
 .add-btn { background: var(--primary-cyan); border: none; width: 100%; padding: 10px; margin-top: 15px; font-weight: bold; cursor: pointer; }
 
 .testimonials { padding: 40px 5%; }
@@ -67,3 +72,37 @@ footer { background: #0d1117; padding: 40px 5% 20px; border-top: 1px solid var(-
 .f-links a { color: #8b949e; text-decoration: none; line-height: 2.2; font-size: 14px; }
 .lib-img { width: 90px; }
 .copy { text-align: center; margin-top: 20px; font-size: 12px; color: #8b949e; }
+
+/* --- DISEÑO RESPONSIVO --- */
+
+/* Para Tablets (Pantallas menores a 992px) */
+@media (max-width: 992px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 productos por fila en lugar de 4 */
+    }
+    .header-container {
+        flex-direction: column; /* Apila el logo y buscador uno sobre otro */
+        gap: 15px;
+    }
+}
+
+/* Para Celulares (Pantallas menores a 600px) */
+@media (max-width: 600px) {
+    .product-grid {
+        grid-template-columns: 1fr; /* 1 solo producto por fila (se ve grande y claro) */
+    }
+    
+    .nav-links {
+        display: none; /* Escondemos el menú horizontal para que no se vea feo */
+    }
+
+    .search-bar {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    .banner-img {
+        height: 200px; /* Ajustamos el banner para que no ocupe toda la pantalla del móvil */
+        object-fit: cover;
+    }
+}
