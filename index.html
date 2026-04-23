@@ -150,51 +150,108 @@
 
     <script src="script.js"></script>
 
-    <script type="module">
-        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
-        
-        createChat({
-            webhookUrl: 'https://paneln8n.serviciosatumedidapro.com/webhook/3730d8bd-2059-48b9-a450-bfa589295b74/chat',
-            showWelcomeScreen: true,
-            defaultLanguage: 'es',
-            initialMessages: [
-                '¡Hola! 👋',
-                'Soy ZanaBot, el asistente de Zanaceutica EIRL. ¿Cómo puedo ayudarte hoy?'
-            ],
-            i18n: {
-                es: {
-                    title: '¡Qué tal! 👋',
-                    subtitle: 'Hablamos. Estamos disponibles 24/7.',
-                    footer: '',
-                    getStarted: 'Nueva conversación',
-                    inputPlaceholder: 'Pregunta lo que quieras',
-                },
+<!-- Estilos para forzar posición correcta del chat n8n -->
+<style>
+    /* Forzar posición inferior derecha en todos los elementos del chat */
+    #n8n-chat,
+    [id*="n8n-chat"],
+    .n8n-chat,
+    [class*="n8n-chat"] {
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        left: auto !important;
+        top: auto !important;
+        z-index: 99999 !important;
+    }
+
+    /* El botón flotante */
+    #n8n-chat .chat-button,
+    [class*="chat-button"],
+    [class*="chatButton"] {
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        left: auto !important;
+        width: 60px !important;
+        height: 60px !important;
+        border-radius: 50% !important;
+        cursor: pointer !important;
+    }
+
+    /* La ventana del chat cuando se abre */
+    [class*="chat-window"],
+    [class*="chatWindow"],
+    [class*="n8n-chat"] .chat-window {
+        position: fixed !important;
+        bottom: 90px !important;
+        right: 20px !important;
+        left: auto !important;
+        top: auto !important;
+        width: 380px !important;
+        max-height: 600px !important;
+        border-radius: 16px !important;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.18) !important;
+    }
+
+    /* Ocultar el chat abierto por defecto */
+    [class*="chat-wrapper"],
+    [class*="chatWrapper"] {
+        display: none;
+    }
+    [class*="chat-wrapper"].open,
+    [class*="chatWrapper"].open {
+        display: flex !important;
+    }
+</style>
+
+<script type="module">
+    import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+    
+    createChat({
+        webhookUrl: 'https://paneln8n.serviciosatumedidapro.com/webhook/3730d8bd-2059-48b9-a450-bfa589295b74/chat',
+        showWelcomeScreen: false,
+        defaultLanguage: 'es',
+        initialMessages: [
+            '¡Hola! 👋',
+            'Soy ZanaBot, el asistente de Zanaceutica EIRL. ¿Cómo puedo ayudarte hoy?'
+        ],
+        i18n: {
+            es: {
+                title: '¡Qué tal! 👋',
+                subtitle: 'Hablamos. Estamos disponibles 24/7.',
+                footer: '',
+                getStarted: 'Nueva conversación',
+                inputPlaceholder: 'Pregunta lo que quieras',
             },
-        });
+        },
+    });
 
-        // Eliminar footer duplicado generado por React, si existe
-        function removeReactFooter() {
-            const rootEl = document.getElementById('root');
-            if (!rootEl) return;
-            rootEl.querySelectorAll('footer').forEach(f => f.remove());
-        }
-
-        // Ejecutar al cargar y vigilar cambios dinámicos del DOM
-        removeReactFooter();
-        const observer = new MutationObserver(removeReactFooter);
-        observer.observe(document.getElementById('root') || document.body, {
-            childList: true,
-            subtree: true
-        });
-        
-        // Reposicionar el chat n8n a la izquierda
-        setTimeout(() => {
-            const chatElements = document.querySelectorAll('[data-key="n8n-chat"], #n8n-chat, [id*="n8n"]');
-            chatElements.forEach(el => {
-                el.style.left = '20px';
-                el.style.right = 'auto';
+    // Forzar posición derecha con observer robusto
+    function fixChatPosition() {
+        const selectors = [
+            '#n8n-chat',
+            '[id*="n8n"]',
+            '[class*="n8n-chat"]',
+            '[class*="chat-container"]',
+            '[class*="chatContainer"]'
+        ];
+        selectors.forEach(sel => {
+            document.querySelectorAll(sel).forEach(el => {
+                el.style.setProperty('right', '20px', 'important');
+                el.style.setProperty('left', 'auto', 'important');
+                el.style.setProperty('bottom', '20px', 'important');
+                el.style.setProperty('position', 'fixed', 'important');
             });
-        }, 500);
-    </script>
+        });
+    }
+
+    // Observer que vigila cualquier elemento nuevo que agregue el widget
+    const observer = new MutationObserver(() => fixChatPosition());
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Intentos escalonados para asegurar que cargue
+    [100, 300, 600, 1000, 2000].forEach(ms => setTimeout(fixChatPosition, ms));
+</script>
 </body>
 </html>
