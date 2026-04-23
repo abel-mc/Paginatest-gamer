@@ -106,3 +106,23 @@ footer { background: #0d1117; padding: 40px 5% 20px; border-top: 1px solid var(-
         object-fit: cover;
     }
 }
+
+/* --- AJUSTE ESPECIAL PARA EL CHATBOT EN MÓVILES --- */
+
+@media (max-width: 600px) {
+    /* Forzamos a que la ventana del chat de n8n se vea mejor */
+    .n8n-chat-widget {
+        width: 100% !important;
+        height: 100% !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        border-radius: 0 !important; /* Que ocupe toda la esquina */
+    }
+
+    /* Si el botón del chat estorba mucho, lo hacemos un poco más pequeño */
+    .n8n-chat-button {
+        bottom: 10px !important;
+        right: 10px !important;
+        transform: scale(0.8); 
+    }
+}

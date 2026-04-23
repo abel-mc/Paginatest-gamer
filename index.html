@@ -150,7 +150,6 @@
 
     <script src="script.js"></script>
 
-<!-- Estilos del chat flotante NetBot -->
 <style>
   #netbot-btn {
     position: fixed;
@@ -172,13 +171,15 @@
   #netbot-btn:hover { transform: scale(1.1); }
   #netbot-btn svg { width: 28px; height: 28px; fill: white; }
 
+  /* Ventana de Chat */
   #netbot-window {
     position: fixed;
     bottom: 96px;
     right: 24px;
     z-index: 99998;
-    width: 360px;
-    max-height: 520px;
+    width: 360px; /* Ancho en computadora */
+    height: 520px;
+    max-height: calc(100% - 120px);
     background: #1a1a2e;
     border-radius: 18px;
     box-shadow: 0 8px 40px rgba(0,0,0,0.4);
@@ -186,9 +187,29 @@
     flex-direction: column;
     overflow: hidden;
     font-family: sans-serif;
+    transition: all 0.3s ease; /* Para que abra suave */
   }
+
+  /* ESTADO ABIERTO */
   #netbot-window.open { display: flex; }
 
+  /* AJUSTE PARA CELULARES (Pantallas pequeñas) */
+  @media (max-width: 600px) {
+    #netbot-window {
+      width: 100%;
+      height: 100%;
+      bottom: 0;
+      right: 0;
+      border-radius: 0;
+      max-height: 100%;
+    }
+    #netbot-btn {
+      bottom: 15px;
+      right: 15px;
+    }
+  }
+
+  /* Diseño interno del chat */
   #netbot-header {
     background: linear-gradient(135deg, #0072ff, #00c6ff);
     padding: 14px 18px;
@@ -207,7 +228,7 @@
   #netbot-header .status { color: rgba(255,255,255,0.8); font-size: 12px; }
   #netbot-close {
     background: none; border: none; color: white;
-    font-size: 22px; cursor: pointer; line-height: 1;
+    font-size: 30px; cursor: pointer; line-height: 1; padding: 5px;
   }
 
   #netbot-messages {
@@ -260,10 +281,9 @@
     border-radius: 24px;
     padding: 10px 16px;
     color: white;
-    font-size: 14px;
+    font-size: 16px; /* 16px para evitar zoom automático en iPhone */
     outline: none;
   }
-  #netbot-input::placeholder { color: #666; }
   #netbot-send {
     width: 40px; height: 40px;
     border-radius: 50%;
@@ -276,12 +296,10 @@
   #netbot-send svg { width: 18px; height: 18px; fill: white; }
 </style>
 
-<!-- Botón flotante -->
 <button id="netbot-btn" onclick="toggleNetBot()" title="Chatear con NetBot">
   <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
 </button>
 
-<!-- Ventana del chat -->
 <div id="netbot-window">
   <div id="netbot-header">
     <div class="info">
@@ -291,7 +309,7 @@
         <div class="status">● Disponible 24/7</div>
       </div>
     </div>
-    <button id="netbot-close" onclick="toggleNetBot()">×</button>
+    <button id="netbot-close" onclick="toggleNetBot()">&times;</button>
   </div>
 
   <div id="netbot-messages">
@@ -316,8 +334,11 @@
 
   function toggleNetBot() {
     netbotOpen = !netbotOpen;
-    document.getElementById('netbot-window').classList.toggle('open', netbotOpen);
-    if (netbotOpen) document.getElementById('netbot-input').focus();
+    const win = document.getElementById('netbot-window');
+    win.classList.toggle('open', netbotOpen);
+    if (netbotOpen) {
+        document.getElementById('netbot-input').focus();
+    }
   }
 
   function addNetBotMsg(text, role) {
@@ -333,6 +354,7 @@
     const input = document.getElementById('netbot-input');
     const text = input.value.trim();
     if (!text) return;
+    
     input.value = '';
     addNetBotMsg(text, 'user');
 
