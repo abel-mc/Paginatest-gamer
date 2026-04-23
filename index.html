@@ -151,15 +151,50 @@
     <script src="script.js"></script>
 
     <script type="module">
-    import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+        
+        createChat({
+            webhookUrl: 'https://paneln8n.serviciosatumedidapro.com/webhook/3730d8bd-2059-48b9-a450-bfa589295b74/chat',
+            showWelcomeScreen: true,
+            defaultLanguage: 'es',
+            initialMessages: [
+                '¡Hola! 👋',
+                'Soy ZanaBot, el asistente de Zanaceutica EIRL. ¿Cómo puedo ayudarte hoy?'
+            ],
+            i18n: {
+                es: {
+                    title: '¡Qué tal! 👋',
+                    subtitle: 'Hablamos. Estamos disponibles 24/7.',
+                    footer: '',
+                    getStarted: 'Nueva conversación',
+                    inputPlaceholder: 'Pregunta lo que quieras',
+                },
+            },
+        });
 
-    createChat({
-        webhookUrl: 'https://paneln8n.serviciosatumedidapro.com/webhook/3730d8bd-2059-48b9-a450-bfa589295b74/chat',
-        title: 'Asistente LienzoStudioCo',
-        welcomeMessage: '¡Hola! Soy la IA de LienzoStudioCo. ¿Buscas algún componente gamer?',
-        backgroundColor: '#0b0e14',
-        mainColor: '#ffcc00', // El amarillo de tu banner
-    });
-</script>
+        // Eliminar footer duplicado generado por React, si existe
+        function removeReactFooter() {
+            const rootEl = document.getElementById('root');
+            if (!rootEl) return;
+            rootEl.querySelectorAll('footer').forEach(f => f.remove());
+        }
+
+        // Ejecutar al cargar y vigilar cambios dinámicos del DOM
+        removeReactFooter();
+        const observer = new MutationObserver(removeReactFooter);
+        observer.observe(document.getElementById('root') || document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        // Reposicionar el chat n8n a la izquierda
+        setTimeout(() => {
+            const chatElements = document.querySelectorAll('[data-key="n8n-chat"], #n8n-chat, [id*="n8n"]');
+            chatElements.forEach(el => {
+                el.style.left = '20px';
+                el.style.right = 'auto';
+            });
+        }, 500);
+    </script>
 </body>
 </html>
